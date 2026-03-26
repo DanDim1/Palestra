@@ -6,7 +6,7 @@
 <title>Tracker Palestra</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
- 
+
   :root {
     --bg: #0f0f0f;
     --surface: #181818;
@@ -27,9 +27,9 @@
     --green-border: #1a3a1f;
     --amber: #fbbf24;
   }
- 
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
- 
+
   body {
     background: var(--bg);
     color: var(--text);
@@ -40,7 +40,7 @@
     max-width: 680px;
     margin: 0 auto;
   }
- 
+
   /* Header */
   header {
     display: flex;
@@ -50,7 +50,7 @@
     padding-bottom: 16px;
     border-bottom: 1px solid var(--border);
   }
- 
+
   .header-left .label {
     font-family: 'DM Mono', monospace;
     font-size: 9px;
@@ -59,19 +59,19 @@
     color: var(--muted);
     margin-bottom: 4px;
   }
- 
+
   h1 {
     font-size: 20px;
     font-weight: 500;
     letter-spacing: -0.02em;
   }
- 
+
   .stats-bar {
     display: flex;
     gap: 20px;
     text-align: right;
   }
- 
+
   .stat { }
   .stat-num {
     font-family: 'DM Mono', monospace;
@@ -86,14 +86,14 @@
     font-family: 'DM Mono', monospace;
     letter-spacing: 0.08em;
   }
- 
+
   /* Tabs */
   .tabs {
     display: flex;
     gap: 6px;
     margin-bottom: 24px;
   }
- 
+
   .tab {
     flex: 1;
     padding: 10px;
@@ -108,28 +108,28 @@
     transition: all 0.15s;
     text-align: center;
   }
- 
+
   .tab.active-a {
     background: var(--accent-a-bg);
     border-color: var(--accent-a-border);
     color: var(--accent-a);
   }
- 
+
   .tab.active-b {
     background: var(--accent-b-bg);
     border-color: var(--accent-b-border);
     color: var(--accent-b);
   }
- 
+
   .tab:hover:not(.active-a):not(.active-b) {
     border-color: var(--border2);
     color: var(--text);
   }
- 
+
   /* Panel */
   .panel { display: none; }
   .panel.active { display: block; }
- 
+
   /* Exercise block */
   .ex-block {
     margin-bottom: 8px;
@@ -137,9 +137,9 @@
     border-radius: 10px;
     overflow: hidden;
   }
- 
+
   .ex-block.is-key { border-color: var(--green-border); }
- 
+
   .ex-header {
     display: flex;
     justify-content: space-between;
@@ -150,14 +150,14 @@
     user-select: none;
     gap: 10px;
   }
- 
+
   .ex-block.is-key .ex-header { background: var(--green-bg); }
- 
+
   .ex-header:hover { background: var(--surface2); }
   .ex-block.is-key .ex-header:hover { background: #0d2015; }
- 
+
   .ex-name-row { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
- 
+
   .ex-title {
     font-weight: 500;
     font-size: 13px;
@@ -165,45 +165,45 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
- 
+
   .key-dot {
     width: 6px; height: 6px;
     border-radius: 50%;
     background: var(--green);
     flex-shrink: 0;
   }
- 
+
   .ex-meta {
     font-family: 'DM Mono', monospace;
     font-size: 10px;
     color: var(--muted);
     white-space: nowrap;
   }
- 
+
   .ex-right {
     display: flex;
     align-items: center;
     gap: 10px;
     flex-shrink: 0;
   }
- 
+
   .ex-best {
     font-family: 'DM Mono', monospace;
     font-size: 11px;
     color: var(--amber);
     white-space: nowrap;
   }
- 
+
   .ex-best:empty::before { content: '—'; color: var(--muted2); }
- 
+
   .chevron {
     font-size: 10px;
     color: var(--muted);
     transition: transform 0.2s;
   }
- 
+
   .ex-block.open .chevron { transform: rotate(180deg); }
- 
+
   /* Log area */
   .ex-body {
     display: none;
@@ -211,9 +211,9 @@
     background: var(--bg);
     border-top: 1px solid var(--border);
   }
- 
+
   .ex-block.open .ex-body { display: block; }
- 
+
   /* Log form */
   .log-form {
     display: flex;
@@ -221,7 +221,7 @@
     margin-bottom: 12px;
     flex-wrap: wrap;
   }
- 
+
   .log-form input {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -233,13 +233,13 @@
     outline: none;
     transition: border-color 0.15s;
   }
- 
+
   .log-form input:focus { border-color: var(--border2); }
   .log-form input::placeholder { color: var(--muted2); }
- 
+
   .input-kg { width: 90px; }
   .input-note { flex: 1; min-width: 120px; }
- 
+
   .btn-log {
     background: var(--surface2);
     border: 1px solid var(--border2);
@@ -253,12 +253,12 @@
     white-space: nowrap;
     transition: all 0.15s;
   }
- 
+
   .btn-log:hover { background: #282828; border-color: #444; }
- 
+
   /* History */
   .history { display: flex; flex-direction: column; gap: 3px; }
- 
+
   .history-row {
     display: grid;
     grid-template-columns: 90px 1fr auto;
@@ -269,23 +269,23 @@
     border-radius: 5px;
     font-size: 12px;
   }
- 
+
   .h-date {
     font-family: 'DM Mono', monospace;
     font-size: 10px;
     color: var(--muted);
   }
- 
+
   .h-weight {
     font-family: 'DM Mono', monospace;
     font-weight: 500;
     color: var(--text);
   }
- 
+
   .h-weight .unit { font-size: 10px; color: var(--muted); }
- 
+
   .h-note { color: var(--muted); font-size: 11px; text-align: right; }
- 
+
   .h-trend {
     font-size: 10px;
     margin-left: 4px;
@@ -293,7 +293,7 @@
   .trend-up { color: var(--green); }
   .trend-down { color: var(--accent-b); }
   .trend-eq { color: var(--muted); }
- 
+
   .h-delete {
     background: none;
     border: none;
@@ -306,14 +306,14 @@
     margin-left: 4px;
   }
   .h-delete:hover { color: var(--accent-b); }
- 
+
   .empty-history {
     font-size: 11px;
     color: var(--muted2);
     font-family: 'DM Mono', monospace;
     padding: 4px 2px;
   }
- 
+
   /* Core block */
   .core-section {
     margin-top: 20px;
@@ -322,7 +322,7 @@
     border: 1px solid var(--green-border);
     border-radius: 10px;
   }
- 
+
   .core-label {
     font-family: 'DM Mono', monospace;
     font-size: 9px;
@@ -331,23 +331,23 @@
     color: var(--green);
     margin-bottom: 10px;
   }
- 
+
   .core-items { display: flex; flex-direction: column; gap: 6px; }
- 
+
   .core-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 13px;
   }
- 
+
   .core-item .name { font-weight: 500; }
   .core-item .detail {
     font-family: 'DM Mono', monospace;
     font-size: 11px;
     color: var(--green);
   }
- 
+
   /* Progress tab */
   #panel-progress .section-title {
     font-family: 'DM Mono', monospace;
@@ -357,14 +357,14 @@
     color: var(--muted);
     margin-bottom: 12px;
   }
- 
+
   .progress-grid {
     display: flex;
     flex-direction: column;
     gap: 4px;
     margin-bottom: 24px;
   }
- 
+
   .progress-row {
     display: grid;
     grid-template-columns: 1fr 80px 80px 60px;
@@ -375,7 +375,7 @@
     border-radius: 7px;
     font-size: 12px;
   }
- 
+
   .pr-name { font-weight: 500; font-size: 13px; }
   .pr-first { font-family: 'DM Mono', monospace; color: var(--muted); font-size: 11px; }
   .pr-best { font-family: 'DM Mono', monospace; color: var(--amber); font-size: 11px; font-weight: 500; }
@@ -383,7 +383,7 @@
   .pr-delta.pos { color: var(--green); }
   .pr-delta.neg { color: var(--accent-b); }
   .pr-delta.zero { color: var(--muted); }
- 
+
   .progress-header {
     display: grid;
     grid-template-columns: 1fr 80px 80px 60px;
@@ -395,10 +395,10 @@
     color: var(--muted2);
     text-transform: uppercase;
   }
- 
+
   .progress-header span:not(:first-child) { text-align: right; }
   .pr-first, .pr-best, .pr-delta { text-align: right; }
- 
+
   /* Clear button */
   .btn-clear {
     background: none;
@@ -413,7 +413,7 @@
     margin-top: 24px;
   }
   .btn-clear:hover { border-color: var(--accent-b-border); color: var(--accent-b); }
- 
+
   .no-data {
     font-family: 'DM Mono', monospace;
     font-size: 11px;
@@ -424,7 +424,7 @@
 </style>
 </head>
 <body>
- 
+
 <header>
   <div class="header-left">
     <div class="label">Tracker · Palestra</div>
@@ -441,17 +441,17 @@
     </div>
   </div>
 </header>
- 
+
 <!-- Tabs -->
 <div class="tabs">
   <button class="tab active-a" onclick="switchTab('a')">Giorno A</button>
   <button class="tab" onclick="switchTab('b')">Giorno B</button>
   <button class="tab" onclick="switchTab('progress')">Progressi</button>
 </div>
- 
+
 <!-- PANEL A -->
 <div class="panel active" id="panel-a">
- 
+
   <div class="ex-block is-key" id="block-lat-machine">
     <div class="ex-header" onclick="toggleBlock('lat-machine')">
       <div class="ex-name-row">
@@ -473,7 +473,7 @@
       <div class="history" id="history-lat-machine"></div>
     </div>
   </div>
- 
+
   <div class="ex-block is-key" id="block-lento-avanti">
     <div class="ex-header" onclick="toggleBlock('lento-avanti')">
       <div class="ex-name-row">
@@ -495,7 +495,7 @@
       <div class="history" id="history-lento-avanti"></div>
     </div>
   </div>
- 
+
   <div class="ex-block" id="block-squat">
     <div class="ex-header" onclick="toggleBlock('squat')">
       <div class="ex-name-row">
@@ -516,7 +516,7 @@
       <div class="history" id="history-squat"></div>
     </div>
   </div>
- 
+
   <div class="ex-block" id="block-panca-piana">
     <div class="ex-header" onclick="toggleBlock('panca-piana')">
       <div class="ex-name-row">
@@ -537,7 +537,7 @@
       <div class="history" id="history-panca-piana"></div>
     </div>
   </div>
- 
+
   <div class="ex-block" id="block-hip-thrust">
     <div class="ex-header" onclick="toggleBlock('hip-thrust')">
       <div class="ex-name-row">
@@ -558,7 +558,7 @@
       <div class="history" id="history-hip-thrust"></div>
     </div>
   </div>
- 
+
   <div class="ex-block" id="block-french-press">
     <div class="ex-header" onclick="toggleBlock('french-press')">
       <div class="ex-name-row">
@@ -579,7 +579,7 @@
       <div class="history" id="history-french-press"></div>
     </div>
   </div>
- 
+
   <div class="core-section">
     <div class="core-label">Core — fine sessione</div>
     <div class="core-items">
@@ -594,10 +594,10 @@
     </div>
   </div>
 </div>
- 
+
 <!-- PANEL B -->
 <div class="panel" id="panel-b">
- 
+
   <div class="ex-block is-key" id="block-pulley-basso">
     <div class="ex-header" onclick="toggleBlock('pulley-basso')">
       <div class="ex-name-row">
@@ -619,7 +619,7 @@
       <div class="history" id="history-pulley-basso"></div>
     </div>
   </div>
- 
+
   <div class="ex-block is-key" id="block-alzate-laterali">
     <div class="ex-header" onclick="toggleBlock('alzate-laterali')">
       <div class="ex-name-row">
@@ -641,7 +641,7 @@
       <div class="history" id="history-alzate-laterali"></div>
     </div>
   </div>
- 
+
   <div class="ex-block is-key" id="block-face-pull">
     <div class="ex-header" onclick="toggleBlock('face-pull')">
       <div class="ex-name-row">
@@ -663,7 +663,7 @@
       <div class="history" id="history-face-pull"></div>
     </div>
   </div>
- 
+
   <div class="ex-block" id="block-affondi">
     <div class="ex-header" onclick="toggleBlock('affondi')">
       <div class="ex-name-row">
@@ -684,7 +684,7 @@
       <div class="history" id="history-affondi"></div>
     </div>
   </div>
- 
+
   <div class="ex-block" id="block-leg-curl">
     <div class="ex-header" onclick="toggleBlock('leg-curl')">
       <div class="ex-name-row">
@@ -705,7 +705,7 @@
       <div class="history" id="history-leg-curl"></div>
     </div>
   </div>
- 
+
   <div class="ex-block" id="block-bilanciere-scott">
     <div class="ex-header" onclick="toggleBlock('bilanciere-scott')">
       <div class="ex-name-row">
@@ -726,7 +726,7 @@
       <div class="history" id="history-bilanciere-scott"></div>
     </div>
   </div>
- 
+
   <div class="ex-block" id="block-push-down">
     <div class="ex-header" onclick="toggleBlock('push-down')">
       <div class="ex-name-row">
@@ -747,7 +747,7 @@
       <div class="history" id="history-push-down"></div>
     </div>
   </div>
- 
+
   <div class="core-section">
     <div class="core-label">Core — fine sessione</div>
     <div class="core-items">
@@ -762,7 +762,7 @@
     </div>
   </div>
 </div>
- 
+
 <!-- PANEL PROGRESSI -->
 <div class="panel" id="panel-progress">
   <div class="section-title">Giorno A</div>
@@ -773,7 +773,7 @@
     <span>Δ</span>
   </div>
   <div class="progress-grid" id="progress-a"></div>
- 
+
   <div class="section-title" style="margin-top:8px">Giorno B</div>
   <div class="progress-header">
     <span>esercizio</span>
@@ -782,15 +782,15 @@
     <span>Δ</span>
   </div>
   <div class="progress-grid" id="progress-b"></div>
- 
+
   <button class="btn-clear" onclick="clearAll()">Cancella tutti i dati</button>
 </div>
- 
+
 <script>
 const EXERCISES_A = ['lat-machine','lento-avanti','squat','panca-piana','hip-thrust','french-press'];
 const EXERCISES_B = ['pulley-basso','alzate-laterali','face-pull','affondi','leg-curl','bilanciere-scott','push-down'];
 const ALL_EXERCISES = [...EXERCISES_A, ...EXERCISES_B];
- 
+
 const NAMES = {
   'lat-machine': 'Lat machine',
   'lento-avanti': 'Lento avanti',
@@ -806,28 +806,50 @@ const NAMES = {
   'bilanciere-scott': 'Bilanciere Scott',
   'push-down': 'Push down'
 };
- 
+
 function getKey(id) { return 'tracker_' + id; }
- 
+
 function getData(id) {
   try { return JSON.parse(localStorage.getItem(getKey(id))) || []; }
   catch { return []; }
 }
- 
+
 function saveData(id, arr) {
   localStorage.setItem(getKey(id), JSON.stringify(arr));
 }
- 
+
 function formatDate(iso) {
   const d = new Date(iso);
   return d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: '2-digit' });
 }
- 
+
 function toggleBlock(id) {
   const block = document.getElementById('block-' + id);
   block.classList.toggle('open');
 }
- 
+
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwtsrVK2mc0IbW0c7qSpAt1ZWkRlibywr6DMUcd_QCiCTYcOE5oFYi1e8PNvOrNWF66dw/exec';
+
+async function saveToSheets(id, entry) {
+  const giorno = EXERCISES_A.includes(id) ? 'A' : 'B';
+  try {
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: entry.date,
+        esercizio: NAMES[id],
+        kg: entry.kg,
+        nota: entry.note || '',
+        giorno
+      })
+    });
+  } catch(e) {
+    console.warn('Sheets sync failed', e);
+  }
+}
+
 function logWeight(id) {
   const kgInput = document.getElementById('kg-' + id);
   const noteInput = document.getElementById('note-' + id);
@@ -837,13 +859,14 @@ function logWeight(id) {
   const data = getData(id);
   data.unshift(entry);
   saveData(id, data);
+  saveToSheets(id, entry);
   kgInput.value = '';
   noteInput.value = '';
   renderHistory(id);
   renderBest(id);
   updateStats();
 }
- 
+
 function deleteEntry(id, index) {
   const data = getData(id);
   data.splice(index, 1);
@@ -852,7 +875,7 @@ function deleteEntry(id, index) {
   renderBest(id);
   updateStats();
 }
- 
+
 function renderHistory(id) {
   const data = getData(id);
   const container = document.getElementById('history-' + id);
@@ -877,7 +900,7 @@ function renderHistory(id) {
     </div>`;
   }).join('');
 }
- 
+
 function renderBest(id) {
   const data = getData(id);
   const el = document.getElementById('best-' + id);
@@ -886,7 +909,7 @@ function renderBest(id) {
   const best = Math.max(...data.map(d => d.kg));
   el.textContent = best + ' kg';
 }
- 
+
 function updateStats() {
   let totalEntries = 0;
   const sessionDates = new Set();
@@ -898,7 +921,7 @@ function updateStats() {
   document.getElementById('total-entries').textContent = totalEntries;
   document.getElementById('total-sessions').textContent = sessionDates.size;
 }
- 
+
 function renderProgress() {
   ['a', 'b'].forEach(day => {
     const exercises = day === 'a' ? EXERCISES_A : EXERCISES_B;
@@ -926,7 +949,7 @@ function renderProgress() {
     container.innerHTML = rows.join('');
   });
 }
- 
+
 function switchTab(tab) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => {
@@ -946,14 +969,14 @@ function switchTab(tab) {
     renderProgress();
   }
 }
- 
+
 function clearAll() {
   if (!confirm('Cancellare tutti i dati salvati?')) return;
   ALL_EXERCISES.forEach(id => localStorage.removeItem(getKey(id)));
   ALL_EXERCISES.forEach(id => { renderHistory(id); renderBest(id); });
   updateStats();
 }
- 
+
 // Init
 ALL_EXERCISES.forEach(id => { renderHistory(id); renderBest(id); });
 updateStats();
