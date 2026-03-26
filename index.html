@@ -807,6 +807,9 @@ const NAMES = {
   'push-down': 'Push down'
 };
 
+const NAMES_REVERSE = Object.fromEntries(Object.entries(NAMES).map(([k,v]) => [v,k]));
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwtsrVK2mc0IbW0c7qSpAt1ZWkRlibywr6DMUcd_QCiCTYcOE5oFYi1e8PNvOrNWF66dw/exec';
+
 function getKey(id) { return 'tracker_' + id; }
 
 function getData(id) {
@@ -824,11 +827,37 @@ function formatDate(iso) {
 }
 
 function toggleBlock(id) {
-  const block = document.getElementById('block-' + id);
-  block.classList.toggle('open');
+  document.getElementById('block-' + id).classList.toggle('open');
 }
 
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwtsrVK2mc0IbW0c7qSpAt1ZWkRlibywr6DMUcd_QCiCTYcOE5oFYi1e8PNvOrNWF66dw/exec';
+async function syncFromSheets() {
+  try {
+    const res = await fetch(SHEETS_URL + '?t=' + Date.now());
+    const rows = await res.json();
+    if (!Array.isArray(rows)) return;
+    // Group rows by exercise
+    const byEx = {};
+    ALL_EXERCISES.forEach(id => byEx[id] = []);
+    rows.forEach(row => {
+      const name = row.esercizio;
+      const id = NAMES_REVERSE[name];
+      if (!id) return;
+      const kg = parseFloat(row.kg);
+      if (isNaN(kg)) return;
+      byEx[id].push({ date: row.data, kg, note: row.nota || '' });
+    });
+    // Sort each exercise by date desc and save to localStorage
+    ALL_EXERCISES.forEach(id => {
+      if (byEx[id].length === 0) return;
+      byEx[id].sort((a, b) => new Date(b.date) - new Date(a.date));
+      saveData(id, byEx[id]);
+    });
+    ALL_EXERCISES.forEach(id => { renderHistory(id); renderBest(id); });
+    updateStats();
+  } catch(e) {
+    console.warn('Sync from Sheets failed', e);
+  }
+}
 
 async function saveToSheets(id, entry) {
   const giorno = EXERCISES_A.includes(id) ? 'A' : 'B';
@@ -916,7 +945,7 @@ function updateStats() {
   ALL_EXERCISES.forEach(id => {
     const data = getData(id);
     totalEntries += data.length;
-    data.forEach(e => sessionDates.add(e.date.split('T')[0]));
+    data.forEach(e => sessionDates.add(String(e.date).split('T')[0]));
   });
   document.getElementById('total-entries').textContent = totalEntries;
   document.getElementById('total-sessions').textContent = sessionDates.size;
@@ -936,7 +965,7 @@ function renderProgress() {
       </div>`;
       const first = data[data.length - 1].kg;
       const best = Math.max(...data.map(d => d.kg));
-      const delta = best - first;
+      const delta = +(best - first).toFixed(1);
       const deltaStr = delta > 0 ? '+' + delta : delta === 0 ? '=' : String(delta);
       const deltaClass = delta > 0 ? 'pos' : delta < 0 ? 'neg' : 'zero';
       return `<div class="progress-row">
@@ -953,7 +982,10 @@ function renderProgress() {
 function switchTab(tab) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => {
-    t.classList.remove('active-a', 'active-b', 'active-progress');
+    t.classList.remove('active-a', 'active-b');
+    t.style.background = '';
+    t.style.borderColor = '';
+    t.style.color = '';
   });
   if (tab === 'a') {
     document.getElementById('panel-a').classList.add('active');
@@ -971,15 +1003,16 @@ function switchTab(tab) {
 }
 
 function clearAll() {
-  if (!confirm('Cancellare tutti i dati salvati?')) return;
+  if (!confirm('Cancellare tutti i dati locali?')) return;
   ALL_EXERCISES.forEach(id => localStorage.removeItem(getKey(id)));
   ALL_EXERCISES.forEach(id => { renderHistory(id); renderBest(id); });
   updateStats();
 }
 
-// Init
+// Init — carica da localStorage poi sincronizza da Sheets
 ALL_EXERCISES.forEach(id => { renderHistory(id); renderBest(id); });
 updateStats();
+syncFromSheets();
 </script>
 </body>
 </html>
