@@ -783,6 +783,7 @@
   </div>
   <div class="progress-grid" id="progress-b"></div>
 
+  <button class="btn-clear" style="border-color:var(--green-border);color:var(--green)" onclick="syncAllToSheets()">↑ Sincronizza tutto su Sheets</button>
   <button class="btn-clear" onclick="clearAll()">Cancella tutti i dati</button>
 </div>
 
@@ -1000,6 +1001,33 @@ function switchTab(tab) {
     document.querySelectorAll('.tab')[2].style.color = 'var(--text)';
     renderProgress();
   }
+}
+
+async function syncAllToSheets() {
+  if (!confirm('Inviare tutti i dati locali a Google Sheets? (sovrascriverà eventuali duplicati)')) return;
+  let count = 0;
+  for (const id of ALL_EXERCISES) {
+    const data = getData(id);
+    const giorno = EXERCISES_A.includes(id) ? 'A' : 'B';
+    for (const entry of data) {
+      try {
+        await fetch(SHEETS_URL, {
+          method: 'POST',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            data: entry.date,
+            esercizio: NAMES[id],
+            kg: entry.kg,
+            nota: entry.note || '',
+            giorno
+          })
+        });
+        count++;
+      } catch(e) { console.warn('Sync failed for', id, e); }
+    }
+  }
+  alert('Sincronizzati ' + count + ' log su Google Sheets');
 }
 
 function clearAll() {
