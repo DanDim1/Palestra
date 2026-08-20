@@ -18,11 +18,15 @@
  * presente viene ignorata, cosi' due dispositivi non si sovrascrivono a vicenda.
  */
 
+// Lasciare vuoto se lo script e' legato al foglio (Estensioni > Apps Script dal
+// foglio stesso). Valorizzarlo solo per uno script autonomo, con l'id che sta
+// nell'URL del foglio tra /d/ e /edit.
+const SHEET_ID = '';
 const SHEET_NAME = 'Calisthenics';
 const HEADERS = ['settimana', 'giorno', 'fatta', 'quando', 'ts'];
 
 function getSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = SHEET_ID ? SpreadsheetApp.openById(SHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();
   let sh = ss.getSheetByName(SHEET_NAME);
   if (!sh) sh = ss.insertSheet(SHEET_NAME);
   if (sh.getLastRow() === 0) sh.appendRow(HEADERS);
