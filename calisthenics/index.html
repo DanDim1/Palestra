@@ -211,6 +211,7 @@
   <footer>
     Nei giorni liberi: camminata 30-40 min, o una nuotata leggera se hai il mare vicino.
     <br>
+    <button class="reset" id="syncBtn" style="display:none;margin-right:6px;">Sincronizza</button>
     <button class="reset" id="resetBtn">Azzera progressi</button>
   </footer>
 
@@ -251,7 +252,133 @@ const WEEKS = [
 
 const TOTAL = WEEKS.length * DAYS.length;
 const STORAGE_KEY = "calisthenics-4wk-progress";
+
+// URL /exec dell'Apps Script (vedi apps-script.gs). Vuoto = solo salvataggio locale.
+const SHEETS_URL = "";
+const STAMPS_KEY = "calisthenics-4wk-stamps";
+
 let state = new Array(TOTAL).fill(false);
+// Quando ogni sessione e' stata toccata su questo dispositivo (ms, 0 = mai).
+// Serve a decidere chi vince se telefono e foglio Google divergono.
+let stamps = new Array(TOTAL).fill(0);
+
+function cloudAttiva(){
+  return typeof SHEETS_URL === "string" && SHEETS_URL.indexOf("http") === 0;
+}
+
+function salvaLocale(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(STAMPS_KEY, JSON.stringify(stamps));
+  }catch(e){
+    console.error("localStorage error", e);
+  }
+}
+
+function segna(i, valore){
+  state[i] = valore;
+  stamps[i] = Date.now();
+}
+
+function segnaTutte(nuovoStato){
+  const adesso = Date.now();
+  state = nuovoStato;
+  stamps = new Array(TOTAL).fill(adesso);
+}
+
+function rigaSessione(i){
+  return {
+    settimana: Math.floor(i / DAYS.length) + 1,
+    giorno: (i % DAYS.length) + 1,
+    fatta: state[i],
+    ts: stamps[i] || Date.now()
+  };
+}
+
+function tutteLeRighe(){
+  const out = [];
+  for (let i = 0; i < TOTAL; i++) out.push(rigaSessione(i));
+  return out;
+}
+
+async function inviaAlFoglio(payload){
+  if (!cloudAttiva()) return false;
+  try{
+    await fetch(SHEETS_URL, {
+      method: "POST",
+      redirect: "follow",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(payload)
+    });
+    return true;
+  }catch(e){
+    console.warn("Salvataggio su Sheets fallito", e);
+    return false;
+  }
+}
+
+async function saveToSheets(i){
+  if (!cloudAttiva()) return;
+  const ok = await inviaAlFoglio(rigaSessione(i));
+  if (!ok){
+    showStatus("Salvata sul dispositivo, ma non su Google. Premi Sincronizza quando torni online.", "error");
+  }
+}
+
+// Unione nei due sensi: per ogni sessione vince la modifica piu' recente,
+// cosi' telefono e computer non si cancellano i progressi a vicenda.
+async function sincronizza(silenzioso){
+  if (!cloudAttiva()) return;
+
+  let remote;
+  try{
+    const res = await fetch(SHEETS_URL + "?t=" + Date.now());
+    remote = await res.json();
+  }catch(e){
+    console.warn("Lettura da Sheets fallita", e);
+    if (!silenzioso) showStatus("Google non raggiungibile. Stai usando i dati locali.", "error");
+    return;
+  }
+  if (!Array.isArray(remote)) return;
+
+  let prese = 0;
+  const daInviare = [];
+  const visti = new Array(TOTAL).fill(false);
+
+  remote.forEach(r => {
+    const wi = Number(r.settimana) - 1;
+    const di = Number(r.giorno) - 1;
+    if (!(wi >= 0 && wi < WEEKS.length)) return;
+    if (!(di >= 0 && di < DAYS.length)) return;
+
+    const i = idx(wi, di);
+    visti[i] = true;
+    const val = r.fatta === true || r.fatta === 1 || String(r.fatta).toLowerCase() === "true";
+    const tsRemoto = Number(r.ts) || 0;
+
+    if (tsRemoto > (stamps[i] || 0)){
+      if (state[i] !== val) prese++;
+      state[i] = val;
+      stamps[i] = tsRemoto;
+    } else if ((stamps[i] || 0) > tsRemoto){
+      daInviare.push(rigaSessione(i));
+    }
+  });
+
+  for (let i = 0; i < TOTAL; i++){
+    if (!visti[i] && stamps[i]) daInviare.push(rigaSessione(i));
+  }
+
+  salvaLocale();
+  render();
+
+  if (daInviare.length) await inviaAlFoglio(daInviare);
+
+  if (!silenzioso){
+    showStatus("Sincronizzato — " + prese + " dal foglio, " + daInviare.length + " inviate.", "ok");
+    setTimeout(() => showStatus(null), 2600);
+  }
+}
 
 function idx(weekIdx, dayIdx){ return weekIdx * DAYS.length + dayIdx; }
 
@@ -331,9 +458,11 @@ document.getElementById("loadCodeBtn").addEventListener("click", () => {
     showStatus("Codice non valido.", "error");
     return;
   }
-  state = decoded;
+  segnaTutte(decoded);
   input.value = "";
+  salvaLocale();
   render();
+  inviaAlFoglio(tutteLeRighe());
   showStatus("Progressi caricati dal codice.", "ok");
   setTimeout(() => showStatus(null), 1800);
 });
@@ -369,13 +498,10 @@ function showStatus(msg, kind){
 
 function toggle(wi, di){
   const i = idx(wi, di);
-  state[i] = !state[i];
+  segna(i, !state[i]);
   render();
-  try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }catch(e){
-    console.error("localStorage error", e);
-  }
+  salvaLocale();
+  saveToSheets(i);
 }
 
 function load(){
@@ -387,22 +513,32 @@ function load(){
         state = parsed;
       }
     }
+    const rawStamps = localStorage.getItem(STAMPS_KEY);
+    if (rawStamps){
+      const parsedStamps = JSON.parse(rawStamps);
+      if (Array.isArray(parsedStamps) && parsedStamps.length === TOTAL){
+        stamps = parsedStamps.map(v => Number(v) || 0);
+      }
+    }
   }catch(e){
     // primo utilizzo, nessun dato salvato ancora
   }
   render();
+  if (cloudAttiva()){
+    document.getElementById("syncBtn").style.display = "inline-block";
+    sincronizza(true);
+  }
 }
 
 document.getElementById("resetBtn").addEventListener("click", () => {
   if (!confirm("Azzerare tutti i progressi?")) return;
-  state = new Array(TOTAL).fill(false);
+  segnaTutte(new Array(TOTAL).fill(false));
   render();
-  try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }catch(e){
-    console.error("localStorage error", e);
-  }
+  salvaLocale();
+  inviaAlFoglio(tutteLeRighe());
 });
+
+document.getElementById("syncBtn").addEventListener("click", () => sincronizza(false));
 
 load();
 </script>
